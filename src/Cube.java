@@ -144,18 +144,27 @@ public class Cube {
 	private interface Algorithm {
 		public String getName();
 		public void execute();
+		public void undo();
 		// public String[] composition;
 	}
 	
 	private abstract class Move implements Algorithm {
+		/*
 		public void undo() {
 			execute(); // really inefficient!
 			execute();
 			execute();
 		};
+		*/
 	}
 	
-	private final Move[] moves = { // static?
+	private abstract class Move2 extends Move{
+		public void undo() {
+			execute();
+		}
+	}
+	
+ 	private final Move[] moves = {
 			new R(),
 			new U(),
 			new L(),
@@ -182,11 +191,17 @@ public class Cube {
 		public void execute() {
 			rotate(12,1,9,21,19);
 		}
+		public void undo() {
+			rotate3(12,1,9,21,19);
+		}
 	}
 	private class U extends Move{
 		public final String getName() {return "U";};
 		public void execute() {
 			rotate(0,16,4,8,12);
+		}
+		public void undo() {
+			rotate3(0,16,4,8,12);
 		}
 	}
 	private class L extends Move{
@@ -194,11 +209,17 @@ public class Cube {
 		public void execute() {
 			rotate(4,3,17,23,11);
 		}
+		public void undo() {
+			rotate3(4,3,17,23,11);
+		}
 	}
 	private class F extends Move{
 		public final String getName() {return "F";};
 		public void execute() {
 			rotate(8,2,5,20,15);
+		}
+		public void undo() {
+			rotate3(8,2,5,20,15);
 		}
 	}
 	private class D extends Move{
@@ -206,102 +227,108 @@ public class Cube {
 		public void execute() {
 			rotate(20,10,6,18,14);
 		}
+		public void undo() {
+			rotate3(20,10,6,18,14);
+		}
 	}
 	private class B extends Move{
 		public final String getName() {return "B";};
 		public void execute() {
 			rotate(16,22,7,0,13);
 		}
+		public void undo() {
+			rotate3(16,22,7,0,13);
+		}
 	}
 	
-	private class R2 extends Move{
+	private class R2 extends Move2{
 		public final String getName() {return "R2";};
 		public void execute() {
-			rotate(12,1,9,21,19);
-			rotate(12,1,9,21,19);
+			rotate2(12,1,9,21,19);
 		}
 	}
-	private class U2 extends Move{
+	private class U2 extends Move2{
 		public final String getName() {return "U2";};
 		public void execute() {
-			rotate(0,16,4,8,12);
-			rotate(0,16,4,8,12);
+			rotate2(0,16,4,8,12);
 		}
 	}
-	private class L2 extends Move{
+	private class L2 extends Move2{
 		public final String getName() {return "L2";};
 		public void execute() {
-			rotate(4,3,17,23,11);
-			rotate(4,3,17,23,11);
+			rotate2(4,3,17,23,11);
 		}
 	}
-	private class F2 extends Move{
+	private class F2 extends Move2{
 		public final String getName() {return "F2";};
 		public void execute() {
-			rotate(8,2,5,20,15);
-			rotate(8,2,5,20,15);
+			rotate2(8,2,5,20,15);
 		}
 	}
-	private class D2 extends Move{
+	private class D2 extends Move2{
 		public final String getName() {return "D2";};
 		public void execute() {
-			rotate(20,10,6,18,14);
-			rotate(20,10,6,18,14);
+			rotate2(20,10,6,18,14);
 		}
 	}
-	private class B2 extends Move{
+	private class B2 extends Move2{
 		public final String getName() {return "B2";};
 		public void execute() {
-			rotate(16,22,7,0,13);
-			rotate(16,22,7,0,13);
+			rotate2(16,22,7,0,13);
 		}
 	}
 	
 	private class R3 extends Move{
 		public final String getName() {return "R'";};
 		public void execute() {
-			rotate(12,1,9,21,19);
-			rotate(12,1,9,21,19);
+			rotate3(12,1,9,21,19);
+		}
+		public void undo() {
 			rotate(12,1,9,21,19);
 		}
 	}
 	private class U3 extends Move{
 		public final String getName() {return "U'";};
 		public void execute() {
-			rotate(0,16,4,8,12);
-			rotate(0,16,4,8,12);
+			rotate3(0,16,4,8,12);
+		}
+		public void undo() {
 			rotate(0,16,4,8,12);
 		}
 	}
 	private class L3 extends Move{
 		public final String getName() {return "L'";};
 		public void execute() {
-			rotate(4,3,17,23,11);
-			rotate(4,3,17,23,11);
+			rotate3(4,3,17,23,11);
+		}
+		public void undo() {
 			rotate(4,3,17,23,11);
 		}
 	}
 	private class F3 extends Move{
 		public final String getName() {return "F'";};
 		public void execute() {
-			rotate(8,2,5,20,15);
-			rotate(8,2,5,20,15);
+			rotate3(8,2,5,20,15);
+		}
+		public void undo() {
 			rotate(8,2,5,20,15);
 		}
 	}
 	private class D3 extends Move{
 		public final String getName() {return "D'";};
 		public void execute() {
-			rotate(20,10,6,18,14);
-			rotate(20,10,6,18,14);
+			rotate3(20,10,6,18,14);
+		}
+		public void undo() {
 			rotate(20,10,6,18,14);
 		}
 	}
 	private class B3 extends Move{
 		public final String getName() {return "B'";};
 		public void execute() {
-			rotate(16,22,7,0,13);
-			rotate(16,22,7,0,13);
+			rotate3(16,22,7,0,13);
+		}
+		public void undo() {
 			rotate(16,22,7,0,13);
 		}
 	}
@@ -322,6 +349,42 @@ public class Cube {
 		edges[k] = edges[l];
 		edges[l] = edges[m];
 		edges[m] = temp;
+	}
+	
+	private void rotate2(int i,int j,int k,int l,int m) {
+		byte temp;
+		
+		temp = edges[i];
+		edges[i] = edges[i+2];
+		edges[i+2] = temp;
+		
+		temp = edges[i+1];
+		edges[i+1] = edges[i+3];
+		edges[i+3] = temp;
+		
+		temp = edges[j];
+		edges[j] = edges[l];
+		edges[l] = temp;
+		
+		temp = edges[k];
+		edges[k] = edges[m];
+		edges[m] = temp;
+	}
+	
+	private void rotate3(int i,int j,int k,int l,int m) {
+		byte temp;
+		
+		temp = edges[i];
+		edges[i] = edges[i+3];
+		edges[i+3] = edges[i+2];
+		edges[i+2] = edges[i+1];
+		edges[i+1] = temp;
+		
+		temp = edges[j];
+		edges[j] = edges[m];
+		edges[m] = edges[l];
+		edges[l] = edges[k];
+		edges[k] = temp;
 	}
 	
 }

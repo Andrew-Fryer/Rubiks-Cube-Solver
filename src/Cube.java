@@ -3,12 +3,13 @@ public class Cube {
 
 	public static void main(String[] args) {
 		String[] testingArgs = new String[1];
-		testingArgs[0] = "L U2 U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R'";
+		testingArgs[0] = "D2 F2 L' D' F' D' R U2"; // "L U2 U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R'";
 		String[] scramble = testingArgs[0].split(" ");
 		Cube myCube = new Cube();
 		myCube.doMoves(scramble);
 		System.out.println("Solving...");
 		myCube.solve();
+		System.out.println();
 		System.out.println("You had better have a solution by now!");
 	}
 	
@@ -97,7 +98,7 @@ public class Cube {
 			this.displaySolution();
 			//System.exit(0); // this will exit as soon as we get a solution
 		}
-		if (depth < 20) {
+		if (depth < 8) {
 			depth++;
 			for (int i = 0; i < 18; i++) {
 				if (depth==1 || i%6 != movePath[depth-2]%6) {
@@ -122,7 +123,7 @@ public class Cube {
 	*/
 	
 	private boolean isSolved() {
-		for (byte i = 0; i < 4; i++) {
+		for (byte i = 0; i < 24; i++) {
 			if (edges[i]!=i) {// || corners[i]!=i) {
 				return false;
 			}

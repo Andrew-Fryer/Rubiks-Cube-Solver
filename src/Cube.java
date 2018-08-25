@@ -87,12 +87,14 @@ public class Cube {
 		return result;
 	}
 	
-	//private String[20] currentSolution = [];
 	private byte depth = 0; // same as index of last moveName in movePath
 	private int[] movePath = new int[20]; // holds the indexes of the moves that have been applied
 	
 	private String solve() {
 		int i;
+		
+		depth = 0;
+		movePath[0] = 0;
 
 		System.out.println("Solving...");
 		
@@ -103,7 +105,7 @@ public class Cube {
 			// move cube to the next state
 			if (movePath[depth] < 17) {
 				moves[movePath[depth]].undo();
-				depth++;
+				movePath[depth]++;
 				moves[movePath[depth]].execute();
 			} else {
 				
@@ -121,13 +123,17 @@ public class Cube {
 				moves[movePath[i]].undo();
 				movePath[i]++;
 				
+				// go one level deeper
+				depth++;
+				
 				// go in
 				for (;i <= depth; i++) {
+					movePath[i] = 0;
 					moves[movePath[i]].execute();
 				}
 			}
 		}
-		return displaySolution(movePath.stream().map(getMove::Cube).toCollection());
+		return "solved"; //displaySolution(movePath.stream().map(getMove::Cube).toCollection());
 	}
 	
 	private void log(int i) {

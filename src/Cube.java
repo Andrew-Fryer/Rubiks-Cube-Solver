@@ -3,14 +3,12 @@ public class Cube {
 
 	public static void main(String[] args) {
 		String[] testingArgs = new String[1];
-		testingArgs[0] = "D2 F2 L' D' F' D' R U2"; // "L U2 U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R'";
+		testingArgs[0] = "D2 F2 L' D' F' D'"; // "L U2 U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R'";
 		String[] scramble = testingArgs[0].split(" ");
 		Cube myCube = new Cube();
 		myCube.doMoves(scramble);
-		System.out.println("Solving...");
-		myCube.solve();
-		System.out.println();
-		System.out.println("You had better have a solution by now!");
+		
+		System.out.println(myCube.solve());
 	}
 	
 	Cube(){
@@ -91,26 +89,45 @@ public class Cube {
 	
 	//private String[20] currentSolution = [];
 	private byte depth = 0; // same as index of last moveName in movePath
-	private int[] movePath = new int[20];
+	private int[] movePath = new int[20]; // holds the indexes of the moves that have been applied
 	
-	private void solve() {
-		if (this.isSolved()) {
-			this.displaySolution();
-			//System.exit(0); // this will exit as soon as we get a solution
-		}
-		if (depth < 8) {
-			depth++;
-			for (int i = 0; i < 18; i++) {
-				if (depth==1 || i%6 != movePath[depth-2]%6) {
-					moves[i].execute();
-					log(i);
-					this.solve();
-					//unlog(move); just let the garbage sit there :)  <- this is a little sloppy
-					moves[i].undo();
+	private String solve() {
+		int i;
+
+		System.out.println("Solving...");
+		
+		while (!isSolved()) {
+			if(depth > 20) {
+				return "No solution found";
+			}
+			// move cube to the next state
+			if (movePath[depth] < 17) {
+				moves[movePath[depth]].undo();
+				depth++;
+				moves[movePath[depth]].execute();
+			} else {
+				
+				// pull out
+				i = depth;
+				while (movePath[i] == 18) {
+					moves[movePath[i]].undo();
+					i--;
+					if (i < 0) {
+						System.out.println("This should never happen");
+					}
+				}
+				
+				// next move
+				moves[movePath[i]].undo();
+				movePath[i]++;
+				
+				// go in
+				for (;i <= depth; i++) {
+					moves[movePath[i]].execute();
 				}
 			}
-			depth--;
 		}
+		return displaySolution(movePath.stream().map(getMove::Cube).toCollection());
 	}
 	
 	private void log(int i) {

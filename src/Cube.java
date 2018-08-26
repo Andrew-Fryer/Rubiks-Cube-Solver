@@ -3,12 +3,99 @@ public class Cube {
 
 	public static void main(String[] args) {
 		String[] testingArgs = new String[1];
-		testingArgs[0] = "D2 F2 L' D' F' D'"; // "L U2 U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R'";
+		testingArgs[0] = "D2 R L2 U F U2"; // "L U2 U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R'";
 		String[] scramble = testingArgs[0].split(" ");
 		Cube myCube = new Cube();
 		myCube.doMoves(scramble);
 		
-		System.out.println(myCube.solve());
+		int[] movePath = myCube.solve();
+		
+		// display solution
+		System.out.println();
+		System.out.print("Solution:    ");
+		for (int i = 0; movePath[i] != -1; i++) {
+			System.out.print(myCube.moves[movePath[i]].getName() + ' ');
+			// is it okay that there will be a space after the last move?
+		}
+	}
+	
+	private int[] solve() {
+		int i;
+		int depth = 0; // same as index of last moveName in movePath
+		int[] movePath = new int[20]; // holds the indexes of the moves that have been applied
+		for (int j = 0; j < movePath.length; j++) {
+			movePath[j] = -1;
+		}
+		
+		movePath[0] = 0;
+		moves[movePath[depth]].execute();
+
+		System.out.println("Solving...");
+		
+		while (!isSolved()) {
+//			if(depth > 20) {
+//				throw new Error("No solution found");
+//			}
+			
+			// move cube to the next state
+			
+			if (movePath[depth] < 17) {
+				moves[movePath[depth]].undo();
+				movePath[depth]++;
+				
+				if (depth>0 && movePath[depth]<16 && (movePath[depth]%6 == movePath[depth-1]%6)) {
+					movePath[depth]++;
+				}
+				
+				moves[movePath[depth]].execute();
+			} else {
+				// pull out
+				for (i = depth; ; i--) {
+				// implement bottom level seperately to be more efficient?
+					
+					if (i < 0) {
+						// go one level deeper
+						depth++;
+						System.out.println("depth is now " + depth);
+						break;
+						
+					} else if (movePath[i] != 17) {
+						// next move
+						moves[movePath[i]].undo();
+						movePath[i]++;
+						
+						if (i>0 && (movePath[i]%6 == movePath[i-1]%6)) {
+							movePath[i]++;
+						}
+						if (movePath[i] < 18) {
+							moves[movePath[i]].execute();
+						} else {
+							// clean up after optimization
+							// go in to the last state in this part of the tree
+							for (; i <= depth; i++) {
+							// I could avoid this with a flag, but it would be messy
+								movePath[i] = 17;
+								moves[movePath[i]].execute();
+							}
+							// since i == depth + 1, we avoid "going in" below
+						}
+						break;
+					}
+
+					moves[movePath[i]].undo(); // really hard to read....
+				}
+				
+				// go in
+				i++; // so that we don't overwrite the current move
+				for (;i <= depth; i++) {
+					movePath[i] = 0; // those are all on the same side (so I can optimize here)
+					moves[movePath[i]].execute();
+				}
+				// current value of i (depth+1) should not be used
+			}
+		}
+		
+		return movePath;
 	}
 	
 	Cube(){
@@ -16,6 +103,15 @@ public class Cube {
 			edges[i] = i;
 			//corners[i] = i;
 		}
+	}
+	
+	private boolean isSolved() {
+		for (byte i = 0; i < 24; i++) {
+			if (edges[i]!=i) {// || corners[i]!=i) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	private void doMoves(String[] scramble) {
@@ -86,109 +182,24 @@ public class Cube {
 		}
 		return result;
 	}
-	
-	private byte depth = 0; // same as index of last moveName in movePath
-	private int[] movePath = new int[20]; // holds the indexes of the moves that have been applied
-	
-	private String solve() {
-		int i;
-		
-		depth = 0;
-		movePath[0] = 0;
 
-		System.out.println("Solving...");
-		
-		while (!isSolved()) {
-			if(depth > 20) {
-				return "No solution found";
-			}
-			// move cube to the next state
-			if (movePath[depth] < 17) {
-				moves[movePath[depth]].undo();
-				movePath[depth]++;
-				moves[movePath[depth]].execute();
-			} else {
-				
-				// pull out
-				i = depth;
-				while (movePath[i] == 18) {
-					moves[movePath[i]].undo();
-					i--;
-					if (i < 0) {
-						System.out.println("This should never happen");
-					}
-				}
-				
-				// next move
-				moves[movePath[i]].undo();
-				movePath[i]++;
-				
-				// go one level deeper
-				depth++;
-				
-				// go in
-				for (;i <= depth; i++) {
-					movePath[i] = 0;
-					moves[movePath[i]].execute();
-				}
-			}
-		}
-		return "solved"; //displaySolution(movePath.stream().map(getMove::Cube).toCollection());
-	}
-	
-	private void log(int i) {
-		movePath[depth-1] = i;
-	}
-	/*
-	private void unlog() {
-		movePath.pop();
-	}
-	*/
-	
-	private boolean isSolved() {
-		for (byte i = 0; i < 24; i++) {
-			if (edges[i]!=i) {// || corners[i]!=i) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	private void displaySolution() {
-		System.out.println();
-		System.out.print("Solution:    ");
-		for (int i = 0; i < depth; i++) {
-			System.out.print(moves[movePath[i]].getName() + ' ');
-		}
-	}
-	
 	private byte[] edges = new byte[24];
 	//private byte[] corners = new byte[24];
 	
-	private interface Algorithm {
+	private interface Move {
 		public String getName();
 		public void execute();
 		public void undo();
-		// public String[] composition;
 	}
-	
-	private abstract class Move implements Algorithm {
-		/*
-		public void undo() {
-			execute(); // really inefficient!
-			execute();
-			execute();
-		};
-		*/
-	}
-	
-	private abstract class Move2 extends Move{
+ 	
+	private abstract class Move2 {
+		public abstract void execute();
 		public void undo() {
 			execute();
 		}
 	}
 	
- 	private final Move[] moves = {
+	private final Move[] moves = {
 			new R(),
 			new U(),
 			new L(),
@@ -209,7 +220,7 @@ public class Cube {
 			new B2(),
 	};
 	
-	private class R extends Move{
+	private class R implements Move{
 		private static final String name = "R";
 		public final String getName() {return name;};
 		public void execute() {
@@ -219,7 +230,7 @@ public class Cube {
 			rotate3(12,1,9,21,19);
 		}
 	}
-	private class U extends Move{
+	private class U implements Move{
 		public final String getName() {return "U";};
 		public void execute() {
 			rotate(0,16,4,8,12);
@@ -228,7 +239,7 @@ public class Cube {
 			rotate3(0,16,4,8,12);
 		}
 	}
-	private class L extends Move{
+	private class L implements Move{
 		public final String getName() {return "L";};
 		public void execute() {
 			rotate(4,3,17,23,11);
@@ -237,7 +248,7 @@ public class Cube {
 			rotate3(4,3,17,23,11);
 		}
 	}
-	private class F extends Move{
+	private class F implements Move{
 		public final String getName() {return "F";};
 		public void execute() {
 			rotate(8,2,5,20,15);
@@ -246,7 +257,7 @@ public class Cube {
 			rotate3(8,2,5,20,15);
 		}
 	}
-	private class D extends Move{
+	private class D implements Move{
 		public final String getName() {return "D";};
 		public void execute() {
 			rotate(20,10,6,18,14);
@@ -255,7 +266,7 @@ public class Cube {
 			rotate3(20,10,6,18,14);
 		}
 	}
-	private class B extends Move{
+	private class B implements Move{
 		public final String getName() {return "B";};
 		public void execute() {
 			rotate(16,22,7,0,13);
@@ -265,44 +276,44 @@ public class Cube {
 		}
 	}
 	
-	private class R2 extends Move2{
+	private class R2 extends Move2 implements Move{
 		public final String getName() {return "R2";};
 		public void execute() {
 			rotate2(12,1,9,21,19);
 		}
 	}
-	private class U2 extends Move2{
+	private class U2 extends Move2 implements Move{
 		public final String getName() {return "U2";};
 		public void execute() {
 			rotate2(0,16,4,8,12);
 		}
 	}
-	private class L2 extends Move2{
+	private class L2 extends Move2 implements Move{
 		public final String getName() {return "L2";};
 		public void execute() {
 			rotate2(4,3,17,23,11);
 		}
 	}
-	private class F2 extends Move2{
+	private class F2 extends Move2 implements Move{
 		public final String getName() {return "F2";};
 		public void execute() {
 			rotate2(8,2,5,20,15);
 		}
 	}
-	private class D2 extends Move2{
+	private class D2 extends Move2 implements Move{
 		public final String getName() {return "D2";};
 		public void execute() {
 			rotate2(20,10,6,18,14);
 		}
 	}
-	private class B2 extends Move2{
+	private class B2 extends Move2 implements Move{
 		public final String getName() {return "B2";};
 		public void execute() {
 			rotate2(16,22,7,0,13);
 		}
 	}
 	
-	private class R3 extends Move{
+	private class R3 implements Move{
 		public final String getName() {return "R'";};
 		public void execute() {
 			rotate3(12,1,9,21,19);
@@ -311,7 +322,7 @@ public class Cube {
 			rotate(12,1,9,21,19);
 		}
 	}
-	private class U3 extends Move{
+	private class U3 implements Move{
 		public final String getName() {return "U'";};
 		public void execute() {
 			rotate3(0,16,4,8,12);
@@ -320,7 +331,7 @@ public class Cube {
 			rotate(0,16,4,8,12);
 		}
 	}
-	private class L3 extends Move{
+	private class L3 implements Move{
 		public final String getName() {return "L'";};
 		public void execute() {
 			rotate3(4,3,17,23,11);
@@ -329,7 +340,7 @@ public class Cube {
 			rotate(4,3,17,23,11);
 		}
 	}
-	private class F3 extends Move{
+	private class F3 implements Move{
 		public final String getName() {return "F'";};
 		public void execute() {
 			rotate3(8,2,5,20,15);
@@ -338,7 +349,7 @@ public class Cube {
 			rotate(8,2,5,20,15);
 		}
 	}
-	private class D3 extends Move{
+	private class D3 implements Move{
 		public final String getName() {return "D'";};
 		public void execute() {
 			rotate3(20,10,6,18,14);
@@ -347,7 +358,7 @@ public class Cube {
 			rotate(20,10,6,18,14);
 		}
 	}
-	private class B3 extends Move{
+	private class B3 implements Move{
 		public final String getName() {return "B'";};
 		public void execute() {
 			rotate3(16,22,7,0,13);

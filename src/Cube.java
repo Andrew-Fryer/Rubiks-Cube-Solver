@@ -3,7 +3,7 @@ public class Cube {
 
 	public static void main(String[] args) {
 		String[] testingArgs = new String[1];
-		testingArgs[0] = "D2 R L2 U F U2"; // "L U2 U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R'";
+		testingArgs[0] = "R U R' U R U2 R'"; // "L U2 U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R'";
 		String[] scramble = testingArgs[0].split(" ");
 		Cube myCube = new Cube();
 		myCube.doMoves(scramble);
@@ -32,7 +32,7 @@ public class Cube {
 
 		System.out.println("Solving...");
 		
-		while (!isSolved()) {
+		while (!isSolvedInAnyDirection()) {
 //			if(depth > 20) {
 //				throw new Error("No solution found");
 //			}
@@ -100,14 +100,22 @@ public class Cube {
 	
 	Cube(){
 		for (byte i = 0; i < 24; i++) {
-			edges[i] = i;
-			//corners[i] = i;
+			corners[i] = i;
 		}
 	}
 	
-	private boolean isSolved() {
-		for (byte i = 0; i < 24; i++) {
-			if (edges[i]!=i) {// || corners[i]!=i) {
+	private boolean isSolvedInAnyDirection() {
+		for (int i = 0; i < 6; i++) {
+			if (isSolved(i*4)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean isSolved(int k) {
+		for (int i = 0; i < 24; i++) {
+			if (corners[i] != (i+k)%24) {
 				return false;
 			}
 		}
@@ -183,8 +191,7 @@ public class Cube {
 		return result;
 	}
 
-	private byte[] edges = new byte[24];
-	//private byte[] corners = new byte[24];
+	private byte[] corners = new byte[24];
 	
 	private interface Move {
 		public String getName();
@@ -198,6 +205,15 @@ public class Cube {
 			execute();
 		}
 	}
+	
+	private final Move[] TwoByTwoMoves = {
+			new R(),
+			new U(),
+			new F(),
+			new R3(),
+			new U3(),
+			new F3()
+	};
 	
 	private final Move[] moves = {
 			new R(),
@@ -370,56 +386,76 @@ public class Cube {
 	
 	
 	
-	private void rotate(int i,int j,int k,int l,int m) {
+	private void rotate(int i,int j,int k,int l,int m,int n,int o,int p,int q) {
 		byte temp;
 		
-		temp = edges[i];
-		edges[i] = edges[i+1];
-		edges[i+1] = edges[i+2];
-		edges[i+2] = edges[i+3];
-		edges[i+3] = temp;
+		temp = corners[i];
+		corners[i] = corners[i+1];
+		corners[i+1] = corners[i+2];
+		corners[i+2] = corners[i+3];
+		corners[i+3] = temp;
 		
-		temp = edges[j];
-		edges[j] = edges[k];
-		edges[k] = edges[l];
-		edges[l] = edges[m];
-		edges[m] = temp;
+		temp = corners[j];
+		corners[j] = corners[k];
+		corners[k] = corners[l];
+		corners[l] = corners[m];
+		corners[m] = temp;
+		
+		temp = corners[n];
+		corners[n] = corners[o];
+		corners[o] = corners[p];
+		corners[p] = corners[q];
+		corners[q] = temp;
 	}
 	
-	private void rotate2(int i,int j,int k,int l,int m) {
+	private void rotate2(int i,int j,int k,int l,int m,int n,int o,int p,int q) {
 		byte temp;
 		
-		temp = edges[i];
-		edges[i] = edges[i+2];
-		edges[i+2] = temp;
+		temp = corners[i];
+		corners[i] = corners[i+2];
+		corners[i+2] = temp;
 		
-		temp = edges[i+1];
-		edges[i+1] = edges[i+3];
-		edges[i+3] = temp;
+		temp = corners[i+1];
+		corners[i+1] = corners[i+3];
+		corners[i+3] = temp;
 		
-		temp = edges[j];
-		edges[j] = edges[l];
-		edges[l] = temp;
+		temp = corners[j];
+		corners[j] = corners[l];
+		corners[l] = temp;
 		
-		temp = edges[k];
-		edges[k] = edges[m];
-		edges[m] = temp;
+		temp = corners[k];
+		corners[k] = corners[m];
+		corners[m] = temp;
+		
+		temp = corners[n];
+		corners[n] = corners[p];
+		corners[p] = temp;
+		
+		temp = corners[o];
+		corners[o] = corners[q];
+		corners[q] = temp;
 	}
 	
-	private void rotate3(int i,int j,int k,int l,int m) {
+	private void rotate3(int i,int j,int k,int l,int m,int n,int o,int p,int q) {
 		byte temp;
 		
-		temp = edges[i];
-		edges[i] = edges[i+3];
-		edges[i+3] = edges[i+2];
-		edges[i+2] = edges[i+1];
-		edges[i+1] = temp;
+		temp = corners[i];
+		corners[i] = corners[i+3];
+		corners[i+3] = corners[i+2];
+		corners[i+2] = corners[i+1];
+		corners[i+1] = temp;
 		
-		temp = edges[j];
-		edges[j] = edges[m];
-		edges[m] = edges[l];
-		edges[l] = edges[k];
-		edges[k] = temp;
+		temp = corners[j];
+		corners[j] = corners[m];
+		corners[m] = corners[l];
+		corners[l] = corners[k];
+		corners[k] = temp;
+		
+		temp = corners[n];
+		corners[n] = corners[o];
+		corners[o] = corners[p];
+		corners[p] = corners[q];
+		corners[q] = temp;
 	}
 	
 }

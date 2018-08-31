@@ -14,7 +14,7 @@ public class Cube {
 		System.out.println();
 		System.out.print("Solution:    ");
 		for (int i = 0; movePath[i] != -1; i++) {
-			System.out.print(myCube.moves[movePath[i]].getName() + ' ');
+			System.out.print(myCube.TwoByTwoMoves[movePath[i]].getName() + ' ');
 			// is it okay that there will be a space after the last move?
 		}
 	}
@@ -28,7 +28,7 @@ public class Cube {
 		}
 		
 		movePath[0] = 0;
-		moves[movePath[depth]].execute();
+		TwoByTwoMoves[movePath[depth]].execute();
 
 		System.out.println("Solving...");
 		
@@ -40,14 +40,14 @@ public class Cube {
 			// move cube to the next state
 			
 			if (movePath[depth] < 17) {
-				moves[movePath[depth]].undo();
+				TwoByTwoMoves[movePath[depth]].undo();
 				movePath[depth]++;
 				
 				if (depth>0 && movePath[depth]<16 && (movePath[depth]%6 == movePath[depth-1]%6)) {
 					movePath[depth]++;
 				}
 				
-				moves[movePath[depth]].execute();
+				TwoByTwoMoves[movePath[depth]].execute();
 			} else {
 				// pull out
 				for (i = depth; ; i--) {
@@ -61,35 +61,35 @@ public class Cube {
 						
 					} else if (movePath[i] != 17) {
 						// next move
-						moves[movePath[i]].undo();
+						TwoByTwoMoves[movePath[i]].undo();
 						movePath[i]++;
 						
 						if (i>0 && (movePath[i]%6 == movePath[i-1]%6)) {
 							movePath[i]++;
 						}
 						if (movePath[i] < 18) {
-							moves[movePath[i]].execute();
+							TwoByTwoMoves[movePath[i]].execute();
 						} else {
 							// clean up after optimization
 							// go in to the last state in this part of the tree
 							for (; i <= depth; i++) {
 							// I could avoid this with a flag, but it would be messy
 								movePath[i] = 17;
-								moves[movePath[i]].execute();
+								TwoByTwoMoves[movePath[i]].execute();
 							}
 							// since i == depth + 1, we avoid "going in" below
 						}
 						break;
 					}
 
-					moves[movePath[i]].undo(); // really hard to read....
+					TwoByTwoMoves[movePath[i]].undo(); // really hard to read....
 				}
 				
 				// go in
 				i++; // so that we don't overwrite the current move
 				for (;i <= depth; i++) {
 					movePath[i] = 0; // those are all on the same side (so I can optimize here)
-					moves[movePath[i]].execute();
+					TwoByTwoMoves[movePath[i]].execute();
 				}
 				// current value of i (depth+1) should not be used
 			}
@@ -240,147 +240,147 @@ public class Cube {
 		private static final String name = "R";
 		public final String getName() {return name;};
 		public void execute() {
-			rotate(12,1,9,21,19);
+			rotate(12,1,9,21,19,2,10,22,16);
 		}
 		public void undo() {
-			rotate3(12,1,9,21,19);
+			rotate3(12,1,9,21,19,2,10,22,16);
 		}
 	}
 	private class U implements Move{
 		public final String getName() {return "U";};
 		public void execute() {
-			rotate(0,16,4,8,12);
+			rotate(0,16,4,8,12,17,5,9,13);
 		}
 		public void undo() {
-			rotate3(0,16,4,8,12);
+			rotate3(0,16,4,8,12,17,5,9,13);
 		}
 	}
 	private class L implements Move{
 		public final String getName() {return "L";};
 		public void execute() {
-			rotate(4,3,17,23,11);
+			rotate(4,3,17,23,11,0,18,20,8);
 		}
 		public void undo() {
-			rotate3(4,3,17,23,11);
+			rotate3(4,3,17,23,11,0,18,20,8);
 		}
 	}
 	private class F implements Move{
 		public final String getName() {return "F";};
 		public void execute() {
-			rotate(8,2,5,20,15);
+			rotate(8,2,5,20,15,3,6,21,12);
 		}
 		public void undo() {
-			rotate3(8,2,5,20,15);
+			rotate3(8,2,5,20,15,3,6,21,12);
 		}
 	}
 	private class D implements Move{
 		public final String getName() {return "D";};
 		public void execute() {
-			rotate(20,10,6,18,14);
+			rotate(20,10,6,18,14,11,7,19,15);
 		}
 		public void undo() {
-			rotate3(20,10,6,18,14);
+			rotate3(20,10,6,18,14,11,7,19,15);
 		}
 	}
 	private class B implements Move{
 		public final String getName() {return "B";};
 		public void execute() {
-			rotate(16,22,7,0,13);
+			rotate(16,22,7,0,13,23,4,1,14);
 		}
 		public void undo() {
-			rotate3(16,22,7,0,13);
+			rotate3(16,22,7,0,13,23,4,1,14);
 		}
 	}
 	
 	private class R2 extends Move2 implements Move{
 		public final String getName() {return "R2";};
 		public void execute() {
-			rotate2(12,1,9,21,19);
+			rotate2(12,1,9,21,19,2,10,22,16);
 		}
 	}
 	private class U2 extends Move2 implements Move{
 		public final String getName() {return "U2";};
 		public void execute() {
-			rotate2(0,16,4,8,12);
+			rotate2(0,16,4,8,12,17,5,9,13);
 		}
 	}
 	private class L2 extends Move2 implements Move{
 		public final String getName() {return "L2";};
 		public void execute() {
-			rotate2(4,3,17,23,11);
+			rotate2(4,3,17,23,11,0,18,20,8);
 		}
 	}
 	private class F2 extends Move2 implements Move{
 		public final String getName() {return "F2";};
 		public void execute() {
-			rotate2(8,2,5,20,15);
+			rotate2(8,2,5,20,15,3,6,21,12);
 		}
 	}
 	private class D2 extends Move2 implements Move{
 		public final String getName() {return "D2";};
 		public void execute() {
-			rotate2(20,10,6,18,14);
+			rotate2(20,10,6,18,14,11,7,19,15);
 		}
 	}
 	private class B2 extends Move2 implements Move{
 		public final String getName() {return "B2";};
 		public void execute() {
-			rotate2(16,22,7,0,13);
+			rotate2(16,22,7,0,13,23,4,1,14);
 		}
 	}
 	
 	private class R3 implements Move{
 		public final String getName() {return "R'";};
 		public void execute() {
-			rotate3(12,1,9,21,19);
+			rotate3(12,1,9,21,19,2,10,22,16);
 		}
 		public void undo() {
-			rotate(12,1,9,21,19);
+			rotate(12,1,9,21,19,2,10,22,16);
 		}
 	}
 	private class U3 implements Move{
 		public final String getName() {return "U'";};
 		public void execute() {
-			rotate3(0,16,4,8,12);
+			rotate3(0,16,4,8,12,17,5,9,13);
 		}
 		public void undo() {
-			rotate(0,16,4,8,12);
+			rotate(0,16,4,8,12,17,5,9,13);
 		}
 	}
 	private class L3 implements Move{
 		public final String getName() {return "L'";};
 		public void execute() {
-			rotate3(4,3,17,23,11);
+			rotate3(4,3,17,23,11,0,18,20,8);
 		}
 		public void undo() {
-			rotate(4,3,17,23,11);
+			rotate(4,3,17,23,11,0,18,20,8);
 		}
 	}
 	private class F3 implements Move{
 		public final String getName() {return "F'";};
 		public void execute() {
-			rotate3(8,2,5,20,15);
+			rotate3(8,2,5,20,15,3,6,21,12);
 		}
 		public void undo() {
-			rotate(8,2,5,20,15);
+			rotate(8,2,5,20,15,3,6,21,12);
 		}
 	}
 	private class D3 implements Move{
 		public final String getName() {return "D'";};
 		public void execute() {
-			rotate3(20,10,6,18,14);
+			rotate3(20,10,6,18,14,11,7,19,15);
 		}
 		public void undo() {
-			rotate(20,10,6,18,14);
+			rotate(20,10,6,18,14,11,7,19,15);
 		}
 	}
 	private class B3 implements Move{
 		public final String getName() {return "B'";};
 		public void execute() {
-			rotate3(16,22,7,0,13);
+			rotate3(16,22,7,0,13,23,4,1,14);
 		}
 		public void undo() {
-			rotate(16,22,7,0,13);
+			rotate(16,22,7,0,13,23,4,1,14);
 		}
 	}
 	

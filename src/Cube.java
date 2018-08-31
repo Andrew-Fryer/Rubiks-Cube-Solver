@@ -3,7 +3,7 @@ public class Cube {
 
 	public static void main(String[] args) {
 		String[] testingArgs = new String[1];
-		testingArgs[0] = "R U R' U R U2 R'"; // "L U2 U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R'";
+		testingArgs[0] = "R L'"; // "L U2 U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R'";
 		String[] scramble = testingArgs[0].split(" ");
 		Cube myCube = new Cube();
 		myCube.doMoves(scramble);
@@ -33,17 +33,17 @@ public class Cube {
 		System.out.println("Solving...");
 		
 		while (!isSolvedInAnyDirection()) {
-//			if(depth > 20) {
+//			if(depth > 14) {
 //				throw new Error("No solution found");
 //			}
 			
 			// move cube to the next state
 			
-			if (movePath[depth] < 17) {
+			if (movePath[depth] < 5) {
 				TwoByTwoMoves[movePath[depth]].undo();
 				movePath[depth]++;
 				
-				if (depth>0 && movePath[depth]<16 && (movePath[depth]%6 == movePath[depth-1]%6)) {
+				if (depth>0 && movePath[depth]<4 && (movePath[depth]%3 == movePath[depth-1]%3)) {
 					movePath[depth]++;
 				}
 				
@@ -59,7 +59,7 @@ public class Cube {
 						System.out.println("depth is now " + depth);
 						break;
 						
-					} else if (movePath[i] != 17) {
+					} else if (movePath[i] != 5) {
 						// next move
 						TwoByTwoMoves[movePath[i]].undo();
 						movePath[i]++;
@@ -67,14 +67,14 @@ public class Cube {
 						if (i>0 && (movePath[i]%6 == movePath[i-1]%6)) {
 							movePath[i]++;
 						}
-						if (movePath[i] < 18) {
+						if (movePath[i] < 6) {
 							TwoByTwoMoves[movePath[i]].execute();
 						} else {
 							// clean up after optimization
 							// go in to the last state in this part of the tree
 							for (; i <= depth; i++) {
 							// I could avoid this with a flag, but it would be messy
-								movePath[i] = 17;
+								movePath[i] = 5;
 								TwoByTwoMoves[movePath[i]].execute();
 							}
 							// since i == depth + 1, we avoid "going in" below

@@ -3,7 +3,7 @@ public class Cube {
 
 	public static void main(String[] args) {
 		String[] testingArgs = new String[1];
-		testingArgs[0] = "R R R R"; //"R L'"; // "L U2 U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R'";
+		testingArgs[0] = "R'"; //"R L'"; // "L U2 U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R'";
 		String[] scramble = testingArgs[0].split(" ");
 		Cube myCube = new Cube();
 		myCube.doMoves(scramble);

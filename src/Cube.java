@@ -3,7 +3,7 @@ public class Cube {
 
 	public static void main(String[] args) {
 		String[] testingArgs = new String[1];
-		testingArgs[0] = "R L'"; // "L U2 U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R'";
+		testingArgs[0] = "R R R R"; //"R L'"; // "L U2 U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R'";
 		String[] scramble = testingArgs[0].split(" ");
 		Cube myCube = new Cube();
 		myCube.doMoves(scramble);
@@ -32,7 +32,7 @@ public class Cube {
 
 		System.out.println("Solving...");
 		
-		while (!isSolvedInAnyDirection()) {
+		while (!isSolved()) {
 //			if(depth > 14) {
 //				throw new Error("No solution found");
 //			}
@@ -104,18 +104,9 @@ public class Cube {
 		}
 	}
 	
-	private boolean isSolvedInAnyDirection() {
-		for (int i = 0; i < 6; i++) {
-			if (isSolved(i*4)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	private boolean isSolved(int k) {
+	private boolean isSolved() { // I could make all scramble moves legal, and then have globals modify isSolved()
 		for (int i = 0; i < 24; i++) {
-			if (corners[i] != (i+k)%24) {
+			if (corners[i] != i) { // we don't really need to check the bottom, back, left corner's stickers, but whatever...
 				return false;
 			}
 		}
@@ -137,17 +128,8 @@ public class Cube {
 			case "U":
 				result = moves[1];
 				break;
-			case "L":
-				result = moves[2];
-				break;
 			case "F":
 				result = moves[3];
-				break;
-			case "D":
-				result = moves[4];
-				break;
-			case "B":
-				result = moves[5];
 				break;
 			case "R'":
 				result = moves[6];
@@ -155,17 +137,8 @@ public class Cube {
 			case "U'":
 				result = moves[7];
 				break;
-			case "L'":
-				result = moves[8];
-				break;
 			case "F'":
 				result = moves[9];
-				break;
-			case "D'":
-				result = moves[10];
-				break;
-			case "B'":
-				result = moves[11];
 				break;
 			case "R2":
 				result = moves[12];
@@ -173,17 +146,8 @@ public class Cube {
 			case "U2":
 				result = moves[13];
 				break;
-			case "L2":
-				result = moves[14];
-				break;
 			case "F2":
 				result = moves[15];
-				break;
-			case "D2":
-				result = moves[16];
-				break;
-			case "B2":
-				result = moves[17];
 				break;
 			default:
 				throw new Error("Not a legit move notation.");

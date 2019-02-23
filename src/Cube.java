@@ -8,7 +8,7 @@ public class Cube {
 		
 		
 		String[] testingArgs = new String[1];
-		testingArgs[0] = "R'"; //"R L'"; // "L U2 U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R'";
+		testingArgs[0] = "R U U F R' U U F R U U F' R' F U' R R U R F' U F";
 		String[] scramble = testingArgs[0].split(" ");
 		Cube myCube = new Cube();
 		myCube.doMoves(scramble);
@@ -359,10 +359,10 @@ public class Cube {
 		byte temp;
 		
 		temp = corners[i];
-		corners[i] = corners[i+1];
-		corners[i+1] = corners[i+2];
-		corners[i+2] = corners[i+3];
-		corners[i+3] = temp;
+		corners[i] = corners[i+3];
+		corners[i+3] = corners[i+2];
+		corners[i+2] = corners[i+1];
+		corners[i+1] = temp;
 		
 		temp = corners[j];
 		corners[j] = corners[k];
@@ -409,10 +409,10 @@ public class Cube {
 		byte temp;
 		
 		temp = corners[i];
-		corners[i] = corners[i+3];
-		corners[i+3] = corners[i+2];
-		corners[i+2] = corners[i+1];
-		corners[i+1] = temp;
+		corners[i] = corners[i+1];
+		corners[i+1] = corners[i+2];
+		corners[i+2] = corners[i+3];
+		corners[i+3] = temp;
 		
 		temp = corners[j];
 		corners[j] = corners[m];

@@ -2,6 +2,11 @@
 public class Cube {
 
 	public static void main(String[] args) {
+		Cube testCube = new Cube();
+		testCube.TwoByTwoMoves[0].execute();
+		testCube.TwoByTwoMoves[0].undo();
+		
+		
 		String[] testingArgs = new String[1];
 		testingArgs[0] = "R'"; //"R L'"; // "L U2 U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R' U' R'";
 		String[] scramble = testingArgs[0].split(" ");
@@ -22,7 +27,7 @@ public class Cube {
 	private int[] solve() {
 		int i;
 		int depth = 0; // same as index of last moveName in movePath
-		int[] movePath = new int[20]; // holds the indexes of the moves that have been applied
+		int[] movePath = new int[14]; // holds the indexes of the moves that have been applied
 		for (int j = 0; j < movePath.length; j++) {
 			movePath[j] = -1;
 		}
@@ -44,7 +49,7 @@ public class Cube {
 				movePath[depth]++;
 				
 				if (depth>0 && movePath[depth]<4 && (movePath[depth]%3 == movePath[depth-1]%3)) {
-					movePath[depth]++;
+					movePath[depth]++; // don't do 2 moves on the same side in a row
 				}
 				
 				TwoByTwoMoves[movePath[depth]].execute();
@@ -416,10 +421,10 @@ public class Cube {
 		corners[k] = temp;
 		
 		temp = corners[n];
-		corners[n] = corners[o];
-		corners[o] = corners[p];
-		corners[p] = corners[q];
-		corners[q] = temp;
+		corners[n] = corners[q];
+		corners[q] = corners[p];
+		corners[p] = corners[o];
+		corners[o] = temp;
 	}
 	
 }
